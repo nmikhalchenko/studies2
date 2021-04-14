@@ -27,19 +27,6 @@ static hash_t get_hash(key_t key) {
     return g_table.hash_func(key);
 }
 
-// In case keys require to be compared in a special way, you can redefine it.
-// Doubt that it's very useful though
-static bool key_equals(key_t l, key_t r) {
-    return l == r;
-}
-
-// Useless for now
-/*
-static bool value_equals(value_t l, value_t r) {
-    return l == r;
-}
-*/
-
 kv_t make_kv(key_t key, value_t value) {
     return (kv_t) { key, value };
 }
@@ -51,6 +38,8 @@ static bucket_t* make_bucket(void) {
 }
 
 // Useless for now
+// P.S. I know that I never ever clean the buckets up in the program.
+// It doesn't matter though, because the OS should do that anyway.
 /*
 static void free_bucket(bucket_t* bucket) {
     if (bucket) {
@@ -62,7 +51,7 @@ static void free_bucket(bucket_t* bucket) {
 static kv_t* bucket_find_kv(bucket_t* bucket, key_t key) {
     for (int i = 0; i < bucket->count; i++) {
         key_t current_key = bucket->array[i].key;
-        if (key_equals(key, current_key)) {
+        if (key == current_key) {
             return &bucket->array[i];
         }
     }
