@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "row.h"
+#include "math_utils.h"
 
 struct row_s {
     double* cols;
@@ -50,11 +51,7 @@ void row_set(row_t* row, int col, double value) {
 }
 
 void row_assign(row_t* left, row_t* right) {
-    int count = row_count(left);
-    if (count > row_count(right)) {
-        count = row_count(right);
-    }
-
+    int count = min(row_count(left), row_count(right));
     for (int i = 0; i < count; i++) {
         row_set(left, i, row_get(right, i));
     }
@@ -113,7 +110,7 @@ int row_estimate_str_length(row_t* row) {
     return row_count(row) * 32;
 }
 
-static bool is_valid_double_component(char c) {
+static bool is_numeric_char(char c) {
     return isdigit(c) || c == '-' || c == '.';
 }
 
@@ -129,14 +126,14 @@ bool row_fill_from_str(row_t* row, const char* str) {
 
     for (int i = 0; i <= length; i++) {
         c = (i != length) ? str[i] : '\0';
-        if (i == length || (!is_valid_double_component(c) && is_valid_double_component(last))) {
+        if (i == length || (!is_numeric_char(c) && is_numeric_char(last))) {
             if (col >= row_count(row)) {
                 break;
             }
             row_set(row, col, strtod(buf, NULL));
             top = 0;
             col++;
-        } else if (is_valid_double_component(c)) {
+        } else if (is_numeric_char(c)) {
             buf[top++] = c;
         }
         buf[top] = '\0';
